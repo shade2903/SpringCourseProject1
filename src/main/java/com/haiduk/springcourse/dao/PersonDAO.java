@@ -32,7 +32,7 @@ public class PersonDAO {
     }
 
     public Person show(int id){
-    return jdbcTemplate.query("SELECT * FROM PERSON WHERE if=?", new Object[]{id}, new BeanPropertyRowMapper<>(Person.class))
+    return jdbcTemplate.query("SELECT * FROM PERSON WHERE id=?", new Object[]{id}, new BeanPropertyRowMapper<>(Person.class))
             .stream().findAny().orElse(null);
     }
 
