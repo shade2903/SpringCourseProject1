@@ -30,9 +30,8 @@ public class BookDAO {
                 new BeanPropertyRowMapper<>(Book.class)).stream().findAny().orElse(null);
     }
 
-    public Book showByPersonId(int personId){
-        return jdbcTemplate.query("SELECT * FROM Book WHERE person_id = ?", new Object[]{personId},
-                new BeanPropertyRowMapper<>(Book.class)).stream().findAny().orElse(null);
+    public List<Book> showByPersonId(int personId){
+        return jdbcTemplate.query("SELECT * FROM Book WHERE person_id = ?",new Object[]{personId}, new BeanPropertyRowMapper<>(Book.class));
     }
 
     public void update(int id, Book book){

@@ -1,6 +1,8 @@
 package com.haiduk.springcourse.controllers;
 
+import com.haiduk.springcourse.dao.BookDAO;
 import com.haiduk.springcourse.dao.PersonDAO;
+import com.haiduk.springcourse.models.Book;
 import com.haiduk.springcourse.models.Person;
 import com.haiduk.springcourse.util.PersonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,17 +12,20 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @Controller
 @RequestMapping("/people")
 public class PeopleController {
     private final PersonDAO personDAO;
     private final PersonValidator personValidator;
+    private  final BookDAO bookDAO;
 
     @Autowired
-    public PeopleController(PersonDAO personDAO, PersonValidator personValidator) {
+    public PeopleController(PersonDAO personDAO, PersonValidator personValidator, BookDAO bookDAO) {
         this.personDAO = personDAO;
         this.personValidator = personValidator;
+        this.bookDAO = bookDAO;
     }
 
     @GetMapping()
@@ -48,6 +53,7 @@ public class PeopleController {
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model){
         model.addAttribute("person", personDAO.show(id));
+        model.addAttribute("books",bookDAO.showByPersonId(id));
         return "people/show";
     }
 

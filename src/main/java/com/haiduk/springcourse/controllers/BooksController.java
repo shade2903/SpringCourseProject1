@@ -47,7 +47,7 @@ public class BooksController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model){
+    public String show(@PathVariable("id") int id, Model model, @ModelAttribute("person") Person person){
         Book book = bookDAO.showById(id);
         if(book.getPersonId() != null){
             model.addAttribute("owner", personDAO.show(book.getPersonId()));
@@ -58,7 +58,7 @@ public class BooksController {
         return "books/show";
     }
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id){
+    public String edit(Model model, @PathVariable("id") int id ){
         model.addAttribute("book", bookDAO.showById(id));
         return "books/edit";
     }
@@ -74,9 +74,7 @@ public class BooksController {
     }
 
     @PatchMapping("/{id}/assign")
-    public String assignBook(@PathVariable("id") int id, @ModelAttribute Person selectedPerson){
-        System.out.println(selectedPerson.getFullName());
-        System.out.println(selectedPerson.getId());
+    public String assignBook(@PathVariable("id") int id, @ModelAttribute("person" ) Person selectedPerson){
         bookDAO.assignBook(id, selectedPerson);
         return "redirect:/books/" + id;
     }
@@ -85,5 +83,11 @@ public class BooksController {
     public String releaseBook(@PathVariable("id") int id){
         bookDAO.releaseBook(id);
         return "redirect:/books/" + id;
+    }
+
+    @DeleteMapping("/{id}")
+    public String delete(@PathVariable("id") int id){
+        bookDAO.delete(id);
+        return "redirect:/books";
     }
 }
