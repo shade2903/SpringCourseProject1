@@ -17,6 +17,8 @@ public class Book {
     @Min(value = 0, message = "Year should be than 0")
     private int year;
 
+    private Integer personId;
+
     public Book() {
     }
 
@@ -57,5 +59,13 @@ public class Book {
 
     public void setYear(int year) {
         this.year = year;
+    }
+
+    public Integer getPersonId() {
+        return personId;
+    }
+
+    public void setPersonId(Integer personId) {
+        this.personId = personId;
     }
 }

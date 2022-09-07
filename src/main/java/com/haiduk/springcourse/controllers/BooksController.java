@@ -3,15 +3,15 @@ package com.haiduk.springcourse.controllers;
 import com.haiduk.springcourse.dao.BookDAO;
 import com.haiduk.springcourse.dao.PersonDAO;
 import com.haiduk.springcourse.models.Book;
+import com.haiduk.springcourse.models.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/books")
@@ -44,5 +44,46 @@ public class BooksController {
         }
         bookDAO.save(book);
         return "redirect:/books";
+    }
+
+    @GetMapping("/{id}")
+    public String show(@PathVariable("id") int id, Model model){
+        Book book = bookDAO.showById(id);
+        if(book.getPersonId() != null){
+            model.addAttribute("owner", personDAO.show(book.getPersonId()));
+        }else{
+            model.addAttribute("people",personDAO.index());
+        }
+        model.addAttribute("book", book);
+        return "books/show";
+    }
+    @GetMapping("/{id}/edit")
+    public String edit(Model model, @PathVariable("id") int id){
+        model.addAttribute("book", bookDAO.showById(id));
+        return "books/edit";
+    }
+
+    @PatchMapping("/{id}")
+    public String update(@ModelAttribute("book") @Valid Book book, BindingResult bindingResult,
+                         @PathVariable("id") int id){
+        if(bindingResult.hasErrors()){
+            return "books/edit";
+        }
+        bookDAO.update(id, book);
+        return "redirect:/books";
+    }
+
+    @PatchMapping("/{id}/assign")
+    public String assignBook(@PathVariable("id") int id, @ModelAttribute Person selectedPerson){
+        System.out.println(selectedPerson.getFullName());
+        System.out.println(selectedPerson.getId());
+        bookDAO.assignBook(id, selectedPerson);
+        return "redirect:/books/" + id;
+    }
+
+    @PatchMapping("/{id}/release")
+    public String releaseBook(@PathVariable("id") int id){
+        bookDAO.releaseBook(id);
+        return "redirect:/books/" + id;
     }
 }
