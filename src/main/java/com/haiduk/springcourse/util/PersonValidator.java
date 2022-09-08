@@ -11,7 +11,7 @@ import org.springframework.validation.Validator;
 public class PersonValidator implements Validator {
     private final PersonDAO personDAO;
 
-@Autowired
+    @Autowired
     public PersonValidator(PersonDAO personDAO) {
         this.personDAO = personDAO;
     }
@@ -23,10 +23,10 @@ public class PersonValidator implements Validator {
 
     @Override
     public void validate(Object o, Errors errors) {
-    Person person = (Person) o;
-    if(personDAO.showByFullName(person.getFullName()).isPresent()){
-        errors.rejectValue("fullName","","This full name is already taken");
-    }
+        Person person = (Person) o;
+        if (personDAO.showByFullName(person.getFullName()).isPresent()) {
+            errors.rejectValue("fullName", "", "This full name is already taken");
+        }
 
     }
 }

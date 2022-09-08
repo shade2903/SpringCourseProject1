@@ -31,15 +31,15 @@ public class BooksController {
         return "books/index";
     }
 
-        @GetMapping("/new")
-    public String newBook(@ModelAttribute("book") Book book){
+    @GetMapping("/new")
+    public String newBook(@ModelAttribute("book") Book book) {
 
         return "books/new";
     }
 
     @PostMapping()
-    public String create(@ModelAttribute("book") @Validated Book book, BindingResult bindingResult){
-        if(bindingResult.hasErrors()){
+    public String create(@ModelAttribute("book") @Validated Book book, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
             return "books/new";
         }
         bookDAO.save(book);
@@ -47,26 +47,27 @@ public class BooksController {
     }
 
     @GetMapping("/{id}")
-    public String show(@PathVariable("id") int id, Model model, @ModelAttribute("person") Person person){
+    public String show(@PathVariable("id") int id, Model model, @ModelAttribute("person") Person person) {
         Book book = bookDAO.showById(id);
-        if(book.getPersonId() != null){
+        if (book.getPersonId() != null) {
             model.addAttribute("owner", personDAO.show(book.getPersonId()));
-        }else{
-            model.addAttribute("people",personDAO.index());
+        } else {
+            model.addAttribute("people", personDAO.index());
         }
         model.addAttribute("book", book);
         return "books/show";
     }
+
     @GetMapping("/{id}/edit")
-    public String edit(Model model, @PathVariable("id") int id ){
+    public String edit(Model model, @PathVariable("id") int id) {
         model.addAttribute("book", bookDAO.showById(id));
         return "books/edit";
     }
 
     @PatchMapping("/{id}")
     public String update(@ModelAttribute("book") @Valid Book book, BindingResult bindingResult,
-                         @PathVariable("id") int id){
-        if(bindingResult.hasErrors()){
+                         @PathVariable("id") int id) {
+        if (bindingResult.hasErrors()) {
             return "books/edit";
         }
         bookDAO.update(id, book);
@@ -74,19 +75,19 @@ public class BooksController {
     }
 
     @PatchMapping("/{id}/assign")
-    public String assignBook(@PathVariable("id") int id, @ModelAttribute("person" ) Person selectedPerson){
+    public String assignBook(@PathVariable("id") int id, @ModelAttribute("person") Person selectedPerson) {
         bookDAO.assignBook(id, selectedPerson);
         return "redirect:/books/" + id;
     }
 
     @PatchMapping("/{id}/release")
-    public String releaseBook(@PathVariable("id") int id){
+    public String releaseBook(@PathVariable("id") int id) {
         bookDAO.releaseBook(id);
         return "redirect:/books/" + id;
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable("id") int id){
+    public String delete(@PathVariable("id") int id) {
         bookDAO.delete(id);
         return "redirect:/books";
     }
