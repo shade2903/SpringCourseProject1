@@ -12,6 +12,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/books")
@@ -48,13 +49,13 @@ public class BooksController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model, @ModelAttribute("person") Person person) {
-        Book book = bookDAO.showById(id);
-        if (book.getPersonId() != null) {
-            model.addAttribute("owner", personDAO.show(book.getPersonId()));
+        model.addAttribute("book", bookDAO.showById(id));
+        Optional<Person> bookOwner = bookDAO.getOwnerBook(id);
+        if (bookOwner.isPresent()) {
+            model.addAttribute("owner", bookOwner.get());
         } else {
             model.addAttribute("people", personDAO.index());
         }
-        model.addAttribute("book", book);
         return "books/show";
     }
 
