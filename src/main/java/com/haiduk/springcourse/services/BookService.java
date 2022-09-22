@@ -3,10 +3,12 @@ package com.haiduk.springcourse.services;
 import com.haiduk.springcourse.models.Book;
 import com.haiduk.springcourse.models.Person;
 import com.haiduk.springcourse.repositories.BookRepository;
+import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,7 +49,15 @@ public class BookService {
     }
 
     public List<Book> showByPersonId(int personId){
-        return peopleService.findOneById(personId).getBooks();
+        Optional<Person> person = Optional.of(peopleService.findOneById(personId));
+        if (person.isPresent()){
+            Hibernate.initialize(person.get().getBooks());
+            return person.get().getBooks();
+        } else {
+            return Collections.emptyList();
+        }
+
+
     }
 
     @Transactional
@@ -60,11 +70,10 @@ public class BookService {
     }
 
     public void releaseBook(int id){
-        Book book = bookRepository.getById(id);
-        if(book!= null){
-            book.setOwner(null);
-            bookRepository.save(book);
-        }
+      Optional<Book> book = bookRepository.findById(id);
+      if(book.isPresent()){
+          book.get().setOwner(null);
+      }
     }
 
     public Optional<Person> getOwnerBook(int id){
