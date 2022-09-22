@@ -1,9 +1,8 @@
 package com.haiduk.springcourse.controllers;
 
-import com.haiduk.springcourse.dao.BookDAO;
-import com.haiduk.springcourse.dao.PersonDAO;
-import com.haiduk.springcourse.models.Book;
 import com.haiduk.springcourse.models.Person;
+import com.haiduk.springcourse.services.BookService;
+import com.haiduk.springcourse.services.PeopleService;
 import com.haiduk.springcourse.util.PersonValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,25 +11,26 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/people")
 public class PeopleController {
-    private final PersonDAO personDAO;
+
     private final PersonValidator personValidator;
-    private final BookDAO bookDAO;
+    private final PeopleService peopleService;
+    private final BookService bookService;
 
     @Autowired
-    public PeopleController(PersonDAO personDAO, PersonValidator personValidator, BookDAO bookDAO) {
-        this.personDAO = personDAO;
+    public PeopleController(PersonValidator personValidator, PeopleService peopleService, BookService bookService) {
         this.personValidator = personValidator;
-        this.bookDAO = bookDAO;
+        this.peopleService = peopleService;
+        this.bookService = bookService;
     }
+
 
     @GetMapping()
     public String index(Model model) {
-        model.addAttribute("people", personDAO.index());
+        model.addAttribute("people", peopleService.findAll());
         return "people/index";
 
     }
@@ -46,20 +46,20 @@ public class PeopleController {
         if (bindingResult.hasErrors()) {
             return "people/new";
         }
-        personDAO.save(person);
+        peopleService.save(person);
         return "redirect:/people";
     }
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model) {
-        model.addAttribute("person", personDAO.show(id));
-        model.addAttribute("books", bookDAO.showByPersonId(id));
+        model.addAttribute("person", peopleService.findOneById(id));
+        model.addAttribute("books", bookService.showByPersonId(id));
         return "people/show";
     }
 
     @GetMapping("/{id}/edit")
     public String edit(Model model, @PathVariable("id") int id) {
-        model.addAttribute("person", personDAO.show(id));
+        model.addAttribute("person", peopleService.findOneById(id));
         return "people/edit";
 
     }
@@ -71,13 +71,13 @@ public class PeopleController {
         if (bindingResult.hasErrors()) {
             return "people/edit";
         }
-        personDAO.update(id, person);
+        peopleService.update(id, person);
         return "redirect:/people";
     }
 
     @DeleteMapping("/{id}")
     public String delete(@PathVariable("id") int id) {
-        personDAO.delete(id);
+        peopleService.deleteById(id);
         return "redirect:/people";
     }
 }
