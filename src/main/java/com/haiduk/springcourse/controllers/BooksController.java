@@ -52,9 +52,9 @@ public class BooksController {
     @GetMapping("/{id}")
     public String show(@PathVariable("id") int id, Model model, @ModelAttribute("person") Person person) {
         model.addAttribute("book", bookService.showById(id));
-        Optional<Person> bookOwner = bookService.getOwnerBook(id);
-        if (bookOwner.isPresent()) {
-            model.addAttribute("owner", bookOwner.get());
+        Person bookOwner = bookService.getOwnerBook(id);
+        if (bookOwner != null) {
+            model.addAttribute("owner", bookOwner);
         } else {
             model.addAttribute("people", peopleService.findAll());
         }

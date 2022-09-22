@@ -28,8 +28,8 @@ public class BookService {
     }
 
     public Book showById(int id){
-        Optional<Book> foundPerson = bookRepository.findById(id);
-        return foundPerson.orElse(null);
+        Optional<Book> foundBook = bookRepository.findById(id);
+        return foundBook.orElse(null);
     }
 
     @Transactional
@@ -39,7 +39,9 @@ public class BookService {
 
     @Transactional
     public void update(int id, Book updatedBook){
+        Book bookToBeUpdated = bookRepository.findById(id).get();
         updatedBook.setId(id);
+        updatedBook.setOwner(bookToBeUpdated.getOwner());
         bookRepository.save(updatedBook);
     }
 
@@ -62,22 +64,32 @@ public class BookService {
 
     @Transactional
     public void assignBook(int id, Person personOwner){
-        Book book = bookRepository.getById(id);
-        if(book!= null){
-            book.setOwner(personOwner);
-            bookRepository.save(book);
-        }
+        bookRepository.findById(id).ifPresent(
+                book -> {
+                    book.setOwner(personOwner);
+                }
+        );
     }
 
     public void releaseBook(int id){
-      Optional<Book> book = bookRepository.findById(id);
-      if(book.isPresent()){
-          book.get().setOwner(null);
-      }
+     Book book = bookRepository.getById(id);
+     Person person = peopleService.findOneById(book.getOwner().getId());
+     List<Book> books = person.getBooks();
+     books.remove(book);
+        System.out.println(person);
+        book.setOwner(null);
+        System.out.println(book);
+     person.setBooks(books);
+        System.out.println(book.getOwner());
+        System.out.println("books updated for person");
+
+        bookRepository.save(book);
+        System.out.println("Save book and person");
+
     }
 
-    public Optional<Person> getOwnerBook(int id){
-        return Optional.of(bookRepository.getById(id).getOwner());
+    public Person getOwnerBook(int id){
+        return bookRepository.findById(id).map(Book::getOwner).orElse(null);
     }
 
 }
