@@ -64,32 +64,23 @@ public class BookService {
 
     @Transactional
     public void assignBook(int id, Person personOwner){
-        bookRepository.findById(id).ifPresent(
-                book -> {
-                    book.setOwner(personOwner);
-                }
-        );
+        Optional<Book> book = bookRepository.findById(id);
+        if(book.isPresent()){
+            book.get().setOwner(personOwner);
+        }
     }
 
+
+    @Transactional
     public void releaseBook(int id){
-     Book book = bookRepository.getById(id);
-     Person person = peopleService.findOneById(book.getOwner().getId());
-     List<Book> books = person.getBooks();
-     books.remove(book);
-        System.out.println(person);
-        book.setOwner(null);
-        System.out.println(book);
-     person.setBooks(books);
-        System.out.println(book.getOwner());
-        System.out.println("books updated for person");
-
-        bookRepository.save(book);
-        System.out.println("Save book and person");
-
+        Optional<Book> book = bookRepository.findById(id);
+        if(book.isPresent()){
+            book.get().setOwner(null);
+        }
     }
 
     public Person getOwnerBook(int id){
-        return bookRepository.findById(id).map(Book::getOwner).orElse(null);
+        return bookRepository.findById(id).get().getOwner();
     }
 
 }
