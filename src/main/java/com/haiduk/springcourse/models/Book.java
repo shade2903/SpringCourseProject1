@@ -4,6 +4,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
+import java.util.Date;
 
 @Entity
 @Table(name = "book")
@@ -28,6 +29,12 @@ public class Book {
 @ManyToOne
 @JoinColumn(name="person_id", referencedColumnName = "id")
     private Person owner;
+@Column(name="taken_at")
+@Temporal(TemporalType.TIMESTAMP)
+private Date takenAt;
+
+@Transient
+private boolean overdue;
 
     public Book() {
     }

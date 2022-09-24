@@ -1,7 +1,5 @@
 package com.haiduk.springcourse.controllers;
 
-import com.haiduk.springcourse.dao.BookDAO;
-import com.haiduk.springcourse.dao.PersonDAO;
 import com.haiduk.springcourse.models.Book;
 import com.haiduk.springcourse.models.Person;
 import com.haiduk.springcourse.services.BookService;
@@ -14,23 +12,28 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/books")
 public class BooksController {
-  private final BookService bookService;
-  private final PeopleService peopleService;
+    private final BookService bookService;
+    private final PeopleService peopleService;
 
-  @Autowired
+    @Autowired
     public BooksController(BookService bookService, PeopleService peopleService) {
         this.bookService = bookService;
         this.peopleService = peopleService;
     }
 
     @GetMapping()
-    public String index(Model model) {
-        model.addAttribute("books", bookService.index());
+    public String index(Model model, @RequestParam(value = "page", required = false) Integer page,
+                        @RequestParam(value = "books_per_page", required = false) Integer booksPerPage,
+                        @RequestParam(value = "sort_by_year", required = false) boolean sortByYear) {
+        if (page == null && booksPerPage == null) {
+            model.addAttribute("books", bookService.index(sortByYear));
+        } else {
+            model.addAttribute("books", bookService.paginationPage(page, booksPerPage, sortByYear));
+        }
         return "books/index";
     }
 
@@ -93,5 +96,18 @@ public class BooksController {
     public String delete(@PathVariable("id") int id) {
         bookService.deleteById(id);
         return "redirect:/books";
+    }
+
+    @GetMapping("/search")
+    public String searchPage() {
+        return "books/search";
+    }
+
+    @PostMapping("/search")
+    public String searchBook(Model model,
+                             @RequestParam(value = "searchBook") String searchBook) {
+        model.addAttribute("books", bookService.findByTitle(searchBook));
+
+        return "books/search";
     }
 }

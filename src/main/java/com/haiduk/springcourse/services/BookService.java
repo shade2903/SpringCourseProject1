@@ -5,6 +5,8 @@ import com.haiduk.springcourse.models.Person;
 import com.haiduk.springcourse.repositories.BookRepository;
 import org.hibernate.Hibernate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,23 @@ public class BookService {
         this.bookRepository = bookRepository;
         this.peopleService = peopleService;
     }
-    public List<Book> index(){
-        return bookRepository.findAll();
+    public List<Book> index(Boolean sortByYear){
+        if(sortByYear){
+            return bookRepository.findAllByOrderByYear();
+        }else {
+            return bookRepository.findAll();
+        }
+    }
+
+    public List<Book> paginationPage(int page, int booksPerPage, boolean sorted){
+        if(sorted){
+            return bookRepository.findAll(PageRequest.of(page,booksPerPage,Sort.by("year"))).getContent();
+        }
+        return bookRepository.findAll(PageRequest.of(page,booksPerPage)).getContent();
+    }
+
+    public List<Book> findByTitle(String title){
+        return bookRepository.findByTitleStartingWith(title);
     }
 
     public Book showById(int id){
