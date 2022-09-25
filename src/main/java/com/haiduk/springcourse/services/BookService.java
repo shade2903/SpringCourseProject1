@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,8 +70,19 @@ public class BookService {
 
     public List<Book> showByPersonId(int personId){
         Optional<Person> person = Optional.of(peopleService.findOneById(personId));
+        Long dateNow = new Date().getTime();
+        Long tenDaysInMs = 432000000L;
+
+
         if (person.isPresent()){
             Hibernate.initialize(person.get().getBooks());
+            for(Book book : person.get().getBooks()){
+                Long rentalTimeInMs = Math.abs(book.getTakenAt().getTime() - dateNow);
+                if(rentalTimeInMs > tenDaysInMs){
+                    book.setOverdue(true);
+                }
+            }
+
             return person.get().getBooks();
         } else {
             return Collections.emptyList();
@@ -84,6 +96,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findById(id);
         if(book.isPresent()){
             book.get().setOwner(personOwner);
+            book.get().setTakenAt(new Date());
         }
     }
 
@@ -93,6 +106,7 @@ public class BookService {
         Optional<Book> book = bookRepository.findById(id);
         if(book.isPresent()){
             book.get().setOwner(null);
+            book.get().setTakenAt(null);
         }
     }
 
