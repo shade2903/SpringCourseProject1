@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
     <title>Title</title>
 </head>
 <body>
@@ -15,7 +16,12 @@
     <span>Книги:</span>
     <br/>
     <table th:each="book : ${books}">
-        <tr th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getYear()}">book</tr>
+        <td>
+        <span  th:style="${book.isOverdue()} ? 'color: red' : 'color: black'"
+            th:text="${book.getTitle() + ', ' + book.getAuthor() + ', ' + book.getYear()}"
+            >
+            book</span>
+        </td>
     </table>
     <hr/>
 </div>
